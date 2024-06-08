@@ -23,7 +23,7 @@ def text_to_speech(text, path_to_save):
     '''
     text= text
     out_path=  path_to_save
-    print(0)
+    
     # generate the speech
     text_inputs = np.asarray(
         qm_model.tokenizer.text_to_ids(text, language="en"),
@@ -34,3 +34,6 @@ def text_to_speech(text, path_to_save):
 
     # save the synthesized speech
     save_wav(wav=audio[0], path=out_path,sample_rate=22050)
+
+#test
+#text_to_speech("text", "a.wav")

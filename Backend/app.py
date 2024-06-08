@@ -7,6 +7,7 @@ import os
 from bson import ObjectId
 import uuid
 from flask_cors import CORS
+from models import text_to_speech
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -103,13 +104,13 @@ def profile():
 def authenticate():
     session_id = session.get('session_id')
     if not session_id:
-        return jsonify({'authenticated': False}), 401
+        return jsonify({'authenticated': False}), 200
 
     user = db.users.find_one({'sessionids': session_id})
     if user:
         return jsonify({'authenticated': True}), 200
     else:
-        return jsonify({'authenticated': False}), 401
+        return jsonify({'authenticated': False}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
