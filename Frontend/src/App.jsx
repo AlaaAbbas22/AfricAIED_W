@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     path: "/",
     element: (localStorage.getItem("logged")=="true"&&<>
       <button style={{backgroundColor:"#f00"}} onClick={logout}>Log out</button>
-      <Test />
+      <Test baseURL={baseURL}/>
     </>||<Navigate replace to="/login" />),
   },
   {
@@ -41,7 +41,6 @@ const router = createBrowserRouter([
 function App() {
   useEffect(()=>{
       http.get(`${baseURL}/authenticate`).then((response)=>{
-      console.log(response.data.authenticated)
       if (response.data.authenticated){
         localStorage.setItem("logged", "true")
       } else {

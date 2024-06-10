@@ -1,3 +1,4 @@
+from flask import send_file
 from datetime import timedelta
 from flask import Flask, session, request, jsonify
 from flask_session import Session
@@ -111,6 +112,27 @@ def authenticate():
         return jsonify({'authenticated': True}), 200
     else:
         return jsonify({'authenticated': False}), 200
+
+
+@app.route('/tts', methods=['POST'])
+def Tts():
+    
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+
+    text = request.json["text"]
+    path = "a.wav"
+    text_to_speech(text, path)
+    return send_file(
+            path, 
+            mimetype="audio/wav", 
+            as_attachment=True, 
+         )
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
