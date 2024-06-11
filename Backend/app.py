@@ -8,7 +8,7 @@ import os
 from bson import ObjectId
 import uuid
 from flask_cors import CORS
-from models import text_to_speech
+from models import text_to_speech, stt
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -132,6 +132,22 @@ def Tts():
             mimetype="audio/wav", 
             as_attachment=True, 
          )
+
+@app.route('/stt', methods=['POST'])
+def Stt():
+    
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+
+    # this is to be edited to receive the audio in a suitable format from Reactjs
+    path = "a.wav"
+    t = stt(path)
+    return jsonify({'transcript': t}), 200
+
 
 
 if __name__ == '__main__':

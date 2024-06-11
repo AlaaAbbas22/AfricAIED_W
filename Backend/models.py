@@ -36,4 +36,27 @@ def text_to_speech(text, path_to_save):
     save_wav(wav=audio[0], path=out_path,sample_rate=22050)
 
 #test
-#text_to_speech("text", "a.wav")
+#text_to_speech(r"$\mathrm{Mg}^{2+} / \mathrm{Mg},-2.38 \mathrm{~V} ; \quad \mathrm{Al}^{3+} / \mathrm{Al},-1.66 \mathrm{~V}$", "math.wav")
+
+
+import speech_recognition as sr
+
+# Initialize recognizer class (for recognizing the speech)
+recognizer = sr.Recognizer()
+
+def stt(path_to_file):
+
+    '''
+    speech to text function. Takes the path to the file as argument and then returns the text as string.
+    '''
+    # Define the path to your audio file
+    audio_file_path = path_to_file  # Replace with your actual audio file path
+
+    # Load the audio file
+    with sr.AudioFile(audio_file_path) as source:
+        # Listen to the audio file and store it in audio_data
+        audio_data = recognizer.record(source)
+    text = recognizer.recognize_google(audio_data, language="en-GH")
+    return text
+print(stt(fr"E:\AfricAIED\auth.wav"))
+    
