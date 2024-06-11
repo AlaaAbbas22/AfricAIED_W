@@ -58,5 +58,4 @@ def stt(path_to_file):
         audio_data = recognizer.record(source)
     text = recognizer.recognize_google(audio_data, language="en-GH")
     return text
-print(stt(fr"E:\AfricAIED\auth.wav"))
     

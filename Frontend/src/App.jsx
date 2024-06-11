@@ -8,7 +8,7 @@ import {
   } from "react-router-dom";
 
 import http from './components/http';
-import './App.css'
+
 import Test from './components/temp';
 import LoginForm from './components/login';
 

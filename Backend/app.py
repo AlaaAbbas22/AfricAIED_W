@@ -7,6 +7,7 @@ import bcrypt
 import os
 from bson import ObjectId
 import uuid
+import random
 from flask_cors import CORS
 from models import text_to_speech, stt
 from dotenv import load_dotenv
@@ -36,7 +37,7 @@ try:
 except Exception as e:
     print(e)
 
-
+SUBJECTS = ["Chemistry","Mathematics","Biology","Physics"]
 
 
 Session(app)
@@ -149,6 +150,58 @@ def Stt():
     return jsonify({'transcript': t}), 200
 
 
+def get_questions(round, subject, number):
+    sample = db[round].aggregate([{"$match": {'Subject':subject}}, {"$sample": {"size": number}}])
+    questions = []
+    for q in sample:
+        question = {}
+        question["Question"] = q["Question"]
+        question["id"] = str(q["_id"])    
+        questions.append(question)
+    return questions
+
+@app.route('/get_random_question', methods=['POST'])
+def get_random_question():
+
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+    if request.json["subject"] == "random":
+        sub = random.choice(SUBJECTS)
+    else:
+        sub = request.json["subject"]
+    response = get_questions(request.json["round"], sub, 1)[0]
+    return jsonify(response), 200
+
+@app.route('/get_round', methods=['POST'])
+def get_random_questions_complete_round():
+
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+    
+    
+    if request.json["round"] == "round_1":
+        result = []
+        for sub in SUBJECTS:
+            result += get_questions(request.json["round"], sub, 4)
+        return jsonify({"Questions":result}), 200
+
+    elif request.json["round"] == "round_2":
+        ...
+    elif request.json["round"] == "round_3":
+        ...
+    elif request.json["round"] == "round_4":
+        ...
+    elif request.json["round"] == "round_5":
+        ...
+    return jsonify(response), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
