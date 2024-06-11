@@ -1,11 +1,5 @@
 import { useState } from "react";
-import reactLogo from '../assets/react.svg';
-import viteLogo from '/vite.svg';
 import http from './http';
-
-
-
-
 
 function Test({baseURL}) {
     const [input, setInput] = useState("")
@@ -14,7 +8,6 @@ function Test({baseURL}) {
     // function for fetching the backend for tts
     function tts(text){
       http.post(`${baseURL}/tts`, {text}, { responseType: 'blob' }).then((response)=>{
-            
             
         // Create an object URL for the Blob
         const audioUrl = URL.createObjectURL(response.data);
