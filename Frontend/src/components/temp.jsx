@@ -45,7 +45,7 @@ function Test({baseURL}) {
             Convert text to speech
           </button>
         </div>
-        <p className="read-the-docs">
+        <p className="read-the-docs font-bold ring">
           Click on the React logo to learn more
         </p>
       </>

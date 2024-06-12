@@ -201,7 +201,7 @@ def get_random_questions_complete_round():
         ...
     elif request.json["round"] == "round_5":
         ...
-    return jsonify(response), 200
+    return jsonify("response"), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
