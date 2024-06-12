@@ -156,6 +156,8 @@ def get_questions(round, subject, number):
     for q in sample:
         question = {}
         question["Question"] = q["Question"]
+        question["Subject"] = q["Subject"]
+        question["Round"] = round
         question["id"] = str(q["_id"])    
         questions.append(question)
     return questions
@@ -186,6 +188,8 @@ def get_random_questions_complete_round():
     if not user:
         return jsonify({'authenticated': False}), 200
     
+    if not request.json.get("round"):
+        return jsonify({"Response":"Round not specified"})
     
     if request.json["round"] == "round_1":
         result = []
@@ -194,14 +198,28 @@ def get_random_questions_complete_round():
         return jsonify({"Questions":result}), 200
 
     elif request.json["round"] == "round_2":
-        ...
+        result = []
+        for _ in range(12):
+            result += get_questions(request.json["round"], random.choice(SUBJECTS), 1)
+        return jsonify({"Questions":result}), 200
+
     elif request.json["round"] == "round_3":
-        ...
+        result = get_questions(request.json["round"], random.choice(SUBJECTS), 1)
+        return jsonify({"Questions":result}), 200
+    
     elif request.json["round"] == "round_4":
-        ...
+        result = []
+        for _ in range(15):
+            result += get_questions(request.json["round"], random.choice(SUBJECTS), 1)
+        return jsonify({"Questions":result}), 200
+
     elif request.json["round"] == "round_5":
-        ...
-    return jsonify("response"), 200
+        result = []
+        for _ in range(4):
+            result += get_questions(request.json["round"], random.choice(SUBJECTS), 1)
+        return jsonify({"Questions":result}), 200
+    
+    return jsonify({"Response":"Round not found"})
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)
