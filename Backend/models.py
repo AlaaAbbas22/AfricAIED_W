@@ -81,3 +81,31 @@ def grader(question, candidate, reference):
 
     prediction = F.softmax(out.logits, dim=-1).argmax().item()
     return prediction
+
+
+import requests
+import json
+
+def llm_api(input):    # Define the URL of the API endpoint
+    url = "https://api-inference.huggingface.co/models/microsoft/Phi-3-mini-4k-instruct/v1/chat/completions"
+
+    # Define the headers with the cookies
+    headers = {
+        "Content-Type": "application/json",
+        "Cookie": os.environ["llm"]
+    }
+
+    # Define the payload for the request
+    payload = {
+        "model": "microsoft/Phi-3-mini-4k-instruct",
+        "messages": [
+            {'role': 'user', 'content': input}
+        ],
+        "parameters": {"temperature": 0},
+        #"stream": True
+    }
+
+    # Make the request to the API endpoint
+    response = requests.post(url, headers=headers, data=json.dumps(payload))#, stream=True
+
+    return (response.json()['choices'][0]["message"]["content"])

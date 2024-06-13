@@ -112,7 +112,7 @@ def llm_api(input):    # Define the URL of the API endpoint
     # Define the headers with the cookies
     headers = {
         "Content-Type": "application/json",
-        "Cookie": "__stripe_mid=5045a01b-fc63-4a0e-84d0-c394b0377fc35e23ce; token=EYasiXzmJrYtzkOtPEEwCVyLSpkbCQUCSeNuzUWsUGSGediyHrockeYeFgWhjHLNvUQryRxeEFbUYEZuVbmgvSYVutdYrwpZbusFfqLGLyRUKHvanSjCnMlxOPLyOBKc; _ga=GA1.1.41510285.1715339219; _ga_R1FN4KJKJH=GS1.1.1717852211.2.1.1717852397.0.0.0; __stripe_sid=b8be1a3e-601b-498d-8ea4-cf8393e0ae41d61b13; _ga_R4JMGZWPD9=GS1.1.1718204208.2.1.1718204252.0.0.0; aws-waf-token=a73a0dcf-918f-4ee7-ba41-d7507a742759:IAoAr+Jo5pkIAAAA:NjeZ1AKZ9K34EPLZ6afq6TuiPn5hj3DXmU5jVWELPGfDIALh9TrkAwwo+ZpOhill7eBYUaeCRRRGpErzbVP7rh/jyq0TmfIMpgR3bYqoK0Nhxv0iTLJIlWUbZwBZCaY9teAqlk1bfbqJM0rMNIDu/a9TPY6cksxPHROWMLl38i1RZ1XHjM+fSzAiO3nYcBLxRzeZXr48ZWIWn7d48OQr"
+        "Cookie": os.environ["llm"]
     }
 
     # Define the payload for the request
@@ -132,7 +132,7 @@ def llm_api(input):    # Define the URL of the API endpoint
 print(llm_api("How are you?"))
 '''
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+'''from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from torch.nn import functional as F
 
 tokenizer = AutoTokenizer.from_pretrained("kortukov/answer-equivalence-bem")
@@ -151,4 +151,4 @@ inputs = tokenize_function(question, reference, candidate)
 out = model(**inputs)
 
 prediction = F.softmax(out.logits, dim=-1).argmax().item()
-print(prediction)
+print(prediction)'''
