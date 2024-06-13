@@ -58,4 +58,26 @@ def stt(path_to_file):
         audio_data = recognizer.record(source)
     text = recognizer.recognize_google(audio_data, language="en-GH")
     return text
-    
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from torch.nn import functional as F
+
+tokenizer = AutoTokenizer.from_pretrained("kortukov/answer-equivalence-bem")
+model = AutoModelForSequenceClassification.from_pretrained("kortukov/answer-equivalence-bem")
+
+question = "What is a value of pi?"
+reference = "Math"
+candidate = "Mathematics"
+
+def tokenize_function(question, reference, candidate):
+    text = f"[CLS] {candidate} [SEP]"
+    text_pair = f"{reference} [SEP] {question} [SEP]"
+    return tokenizer(text=text, text_pair=text_pair, add_special_tokens=False, padding='max_length', truncation=True, return_tensors='pt')
+
+
+def grader(question, candidate, reference):
+    inputs = tokenize_function(question, reference, candidate)
+    out = model(**inputs)
+
+    prediction = F.softmax(out.logits, dim=-1).argmax().item()
+    return prediction

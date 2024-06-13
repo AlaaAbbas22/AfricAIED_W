@@ -9,7 +9,7 @@ from bson import ObjectId
 import uuid
 import random
 from flask_cors import CORS
-from models import text_to_speech, stt
+from models import text_to_speech, stt, grader
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -177,6 +177,25 @@ def get_random_question():
         sub = request.json["subject"]
     response = get_questions(request.json["round"], sub, 1)[0]
     return jsonify(response), 200
+
+@app.route('/grade', methods=['POST'])
+def grading():
+
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+
+    entry = db[request.json["round"]].find_one({"_id": ObjectId(request.json["id"])})
+    question = entry["Question"]
+    model_answer = entry["Answer"]
+    student_answer = request.json["answer"]
+    if grader(question, student_answer, model_answer)==1:
+        return {"result": True}
+    else:
+        return {"result": False}
 
 @app.route('/get_round', methods=['POST'])
 def get_random_questions_complete_round():

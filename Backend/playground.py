@@ -60,12 +60,11 @@ with pd.ExcelWriter(output_file_path, engine='xlsxwriter') as writer:
         data.to_excel(writer, sheet_name=round_name, index=False)
 '''
 
-
+r'''
 import pandas as pd
 from pymongo import MongoClient
 import numpy as np
-from dotenv import load_dotenv
-load_dotenv()
+
 
 
 
@@ -98,3 +97,58 @@ for round_name, csv_path in csv_files.items():
     collection.insert_many(data)
 
 print("Data has been successfully inserted into MongoDB.")
+'''
+
+from dotenv import load_dotenv
+load_dotenv()
+
+'''
+import requests
+import json
+
+def llm_api(input):    # Define the URL of the API endpoint
+    url = "https://api-inference.huggingface.co/models/microsoft/Phi-3-mini-4k-instruct/v1/chat/completions"
+
+    # Define the headers with the cookies
+    headers = {
+        "Content-Type": "application/json",
+        "Cookie": "__stripe_mid=5045a01b-fc63-4a0e-84d0-c394b0377fc35e23ce; token=EYasiXzmJrYtzkOtPEEwCVyLSpkbCQUCSeNuzUWsUGSGediyHrockeYeFgWhjHLNvUQryRxeEFbUYEZuVbmgvSYVutdYrwpZbusFfqLGLyRUKHvanSjCnMlxOPLyOBKc; _ga=GA1.1.41510285.1715339219; _ga_R1FN4KJKJH=GS1.1.1717852211.2.1.1717852397.0.0.0; __stripe_sid=b8be1a3e-601b-498d-8ea4-cf8393e0ae41d61b13; _ga_R4JMGZWPD9=GS1.1.1718204208.2.1.1718204252.0.0.0; aws-waf-token=a73a0dcf-918f-4ee7-ba41-d7507a742759:IAoAr+Jo5pkIAAAA:NjeZ1AKZ9K34EPLZ6afq6TuiPn5hj3DXmU5jVWELPGfDIALh9TrkAwwo+ZpOhill7eBYUaeCRRRGpErzbVP7rh/jyq0TmfIMpgR3bYqoK0Nhxv0iTLJIlWUbZwBZCaY9teAqlk1bfbqJM0rMNIDu/a9TPY6cksxPHROWMLl38i1RZ1XHjM+fSzAiO3nYcBLxRzeZXr48ZWIWn7d48OQr"
+    }
+
+    # Define the payload for the request
+    payload = {
+        "model": "microsoft/Phi-3-mini-4k-instruct",
+        "messages": [
+            {'role': 'user', 'content': input}
+        ],
+        "parameters": {"temperature": 0},
+        #"stream": True
+    }
+
+    # Make the request to the API endpoint
+    response = requests.post(url, headers=headers, data=json.dumps(payload))#, stream=True
+
+    return (response.json()['choices'][0]["message"]["content"])
+print(llm_api("How are you?"))
+'''
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from torch.nn import functional as F
+
+tokenizer = AutoTokenizer.from_pretrained("kortukov/answer-equivalence-bem")
+model = AutoModelForSequenceClassification.from_pretrained("kortukov/answer-equivalence-bem")
+
+question = "What is the position?"
+reference = "$42 \mathrm{~cm}$"
+candidate = "42 cm"
+
+def tokenize_function(question, reference, candidate):
+    text = f"[CLS] {candidate} [SEP]"
+    text_pair = f"{reference} [SEP] {question} [SEP]"
+    return tokenizer(text=text, text_pair=text_pair, add_special_tokens=False, padding='max_length', truncation=True, return_tensors='pt')
+
+inputs = tokenize_function(question, reference, candidate)
+out = model(**inputs)
+
+prediction = F.softmax(out.logits, dim=-1).argmax().item()
+print(prediction)
