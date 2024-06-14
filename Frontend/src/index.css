@@ -171,7 +171,18 @@ p a:hover {
     align-items: center;
     
   }
+
   
+  button {
+    padding: 10px 20px;
+    background-color:  blue; /* Green */
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 5px;
+  }
+
   .sign-up-button button {
     padding: 10px 20px;
     background-color:  blue; /* Green */
@@ -180,3 +191,10 @@ p a:hover {
     border-radius: 3px;
     cursor: pointer;
   }
+
+
+
+img {
+    margin: auto;
+}
+  
