@@ -52,6 +52,8 @@ def register():
     username = request.json.get('username')
     password = request.json.get('password')
     email = request.json.get('email')
+    school = request.json.get('school')
+    date = request.json.get('date')
 
     if not username or not password or not email:
         return jsonify({'error': 'Username, password, and email are required'}), 400
@@ -59,8 +61,12 @@ def register():
     if db.users.find_one({'username': username}):
         return jsonify({'error': 'Username already exists'}), 400
 
+    if db.users.find_one({'email': email}):
+        return jsonify({'error': 'Email already exists'}), 400
+    session_id = str(uuid.uuid4())
+    session['session_id'] = session_id
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    db.users.insert_one({'username': username, 'password': hashed_password, 'email': email, 'sessionids': []})
+    db.users.insert_one({'username': username, 'password': hashed_password, 'email': email, 'sessionids': [session_id], 'school':school, 'date':date})
 
     return jsonify({'message': 'User registered successfully'}), 200
 
@@ -73,6 +79,8 @@ def login():
         return jsonify({'error': 'Email and password are required'}), 400
 
     user = db.users.find_one({'email': email})
+    if not user:
+        user = db.users.find_one({'username': email})
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
         session_id = str(uuid.uuid4())
         session['session_id'] = session_id
