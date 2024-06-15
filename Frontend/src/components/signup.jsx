@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import http from './http';
 import Logo from '../assets/Logo.jpg'
+import { Link } from 'react-router-dom';
 
 function SignUp({baseURL}){
     
@@ -62,6 +63,7 @@ function SignUp({baseURL}){
                     <button type="submit" onClick={handleSubmit}>Sign Up</button>
 
                 </div>
+                <p>Returner? <Link to="/login">Login instead!</Link></p>
             
         </form>
     </div>)

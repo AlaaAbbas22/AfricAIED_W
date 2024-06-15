@@ -4,20 +4,7 @@ import { Link } from "react-router-dom";
 
 function Dashboard({baseURL}) {    
 
-    // function for fetching the backend for tts
-    function tts(text){
-      http.post(`${baseURL}/tts`, {text}, { responseType: 'blob' }).then((response)=>{
-            
-        // Create an object URL for the Blob
-        const audioUrl = URL.createObjectURL(response.data);
-
-        // Create an audio object and play it
-        const audio = new Audio(audioUrl);
-        
-        audio.play();
-
-      })
-    }
+    
 
 
     

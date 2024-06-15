@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import http from './http';
 import Logo from '../assets/Logo.jpg'
+import { Link } from 'react-router-dom';
 
 function LoginForm({baseURL}){
     
@@ -37,7 +38,7 @@ function LoginForm({baseURL}){
                 </div>
                 <button className="btn" onClick={handleSubmit}>Login</button>
             </form>
-            <p>Are you new here? <a href="signup.html">Sign up</a></p>
+            <p>Are you new here? <Link to="/signup">Sign up</Link></p>
         </div>
         <div className="logo-box">
             <img src={Logo} alt="National Science & Maths Quiz Logo" width="1000" height="200" />

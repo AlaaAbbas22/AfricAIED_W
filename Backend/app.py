@@ -9,7 +9,7 @@ from bson import ObjectId
 import uuid
 import random
 from flask_cors import CORS
-from models import text_to_speech, stt, grader
+from models import text_to_speech, stt, grader, llm_api
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -134,6 +134,9 @@ def Tts():
         return jsonify({'authenticated': False}), 200
 
     text = request.json["text"]
+    #prompt = "Write how a person would read this text. Your response is passed directly to the tts method:"
+    #text = llm_api(prompt+"\n"+text)
+    print(text)
     path = "a.wav"
     text_to_speech(text, path)
     return send_file(
@@ -203,7 +206,8 @@ def grading():
     if grader(question, student_answer, model_answer)==1:
         return {"result": True}
     else:
-        return {"result": False}
+        print(model_answer)
+        return {"result": False, "model":model_answer}
 
 @app.route('/get_round', methods=['POST'])
 def get_random_questions_complete_round():

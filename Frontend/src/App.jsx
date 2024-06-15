@@ -52,6 +52,7 @@ const router = createBrowserRouter([
 
 function App() {
   useEffect(()=>{
+    
       http.get(`${baseURL}/authenticate`).then((response)=>{
       if (response.data.authenticated){
         localStorage.setItem("logged", "true");
