@@ -6,7 +6,7 @@ import tts from "./question"
 
 
 
-const QuestionSimulationRound3 = ({baseURL, question, questionId, sub}) => {
+const QuestionSimulationRound3 = ({baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}}) => {
   
 
   
@@ -50,14 +50,17 @@ const QuestionSimulationRound3 = ({baseURL, question, questionId, sub}) => {
           }
           tts(response.data.result ? 'Correct' : 'Incorrect')
           setResult(response.data.result ? 'Correct' : 'Incorrect');
-          
+          if (response.data.result){
+            scoring((e)=>e+1)
+          };
           if (response.data.model){
             setModel(response.data.model)
           };
         } catch (err) {
           console.error('Error grading answer:', err);
           setError('Error grading answer');
-        }
+        };
+        next(true)
       };
 
       
@@ -65,7 +68,7 @@ const QuestionSimulationRound3 = ({baseURL, question, questionId, sub}) => {
     <div>
       {true ? (
         <div className='p-5'>
-          <h1>Practicing round 3, subject {sub}</h1>
+          {title&&<h1>Practicing round 3, subject {sub}</h1>}
           <p><strong>Question:</strong> <Latex>{question}</Latex></p>
           <form onSubmit={handleSubmit}>
             <input
@@ -77,7 +80,7 @@ const QuestionSimulationRound3 = ({baseURL, question, questionId, sub}) => {
               disabled={answered}
               className='p-3 text-center m-2 font-sans border'
             />
-            <button type="submit">Submit Answer</button>
+            <button disabled={answered} type="submit">Submit Answer</button>
           </form>
           {result && <p><strong>Result:</strong> {result}</p>}
           {model && <p><strong>Model Answer:</strong><br></br> <Latex>{model}</Latex></p>}

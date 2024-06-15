@@ -1,15 +1,21 @@
 import MultiStep from "react-multistep";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import round4 from "../assets/True-And-False.png"
 import round1 from "../assets/round1.png"
 import round2 from "../assets/round2.png"
 import round3 from "../assets/round3.png"
 import round5 from "../assets/round5.webp"
+import Round1 from "./rounds/round1";
+import http from "./http"
+import Round2 from "./rounds/round2";
+import Round3 from "./rounds/round3";
+import Round4 from "./rounds/round4";
+import Round5 from "./rounds/round5";
 
 function Round({baseURL}){
     const [round, setRound] = useState("")
     const [start, setStart] = useState(false)
-
+    const [stage, setStage] = useState("")
     
     function RoundChooser(){
         
@@ -47,23 +53,72 @@ function Round({baseURL}){
     };
 
 
+    const fetchRound = async () => {
+        
+        try {
+          const response = await http.post(`${baseURL}/get_round`, {
+            round: round,
+          });
+    
+          if (response.data.authenticated === false) {
+            alert('User not authenticated');
+            return;
+          }
+    
+          
+          
+          console.log(response.data.Questions);
+          return response.data.Questions;
+        } catch (err) {
+          console.error('Error fetching question:', err);
+          
+        }
+      };
 
+    useEffect( () => {
+        console.log("here ");
+        const temp = async ()=>{
+            const ques = await fetchRound()
+            if(start){switch (round) {
+                case 'round_1':
+                  setStage(<Round1 baseURL={baseURL} questions={ques} />);
+                  break;
+                case 'round_2':
+                  setStage(<Round2 baseURL={baseURL} questions={ques} />);
+                  break;
+                case 'round_3':
+                  setStage(<Round3 baseURL={baseURL} questions={ques} />);
+                  break;
+                case 'round_4':
+                  setStage(<Round4 baseURL={baseURL} questions={ques} />);
+                  break;
+                case 'round_5':
+                    setStage(<Round5 baseURL={baseURL} questions={ques} />);
+                    break;
+                default:
+                  setStage(null);
+                  break;
+              }}    
+        } 
+        temp()
+        
+      }, [start]);
+
+      
 
 
 
     return (<>
             <div className="bg-white w-[70vh]">
-                <h1 className="pt-3">
+                
+                {!start&&<div><h1 className="pt-3">
                     Practicing by round
                 </h1>
-                {!start&&<div>
                         <RoundChooser />
 
                     {(round)&&<button className="bg-green-500 hover:bg-green-400" onClick={()=>setStart(true)}>Goooo!</button>}
                 </div>||
-                <div>
-                    The part of the simulation of the competition (to be completed)
-                </div>}
+                stage}
             </div>
     </>)
 }

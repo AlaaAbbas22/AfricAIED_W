@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import http from './http';
 import Latex from 'react-latex';
 
-const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub }) => {
+const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{} }) => {
   const [answer, setAnswer] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -19,8 +19,8 @@ const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub }) => {
     }, 30000);
 
     if (clueIndex>=question.length - 1){
-        handleSubmit("")
-        setAnswered(true)
+        handleSubmit("");
+        setAnswered(true);
     }
 
     // Cleanup function to clear the timer
@@ -44,21 +44,25 @@ const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub }) => {
       }
 
       setResult(response.data.result ? 'Correct' : 'Incorrect');
-
+      if (response.data.result){
+        scoring((e)=>e+1);
+        setAnswered(true);
+      };
       if (response.data.model) {
         setModel(response.data.model);
       }
     } catch (err) {
       console.error('Error grading answer:', err);
       setError('Error grading answer');
-    }
+    };
+    next(true);
   };
 
   return (
     <div>
       {true ? (
         <div className="p-5">
-          <h1>Practicing round 5, subject {sub}</h1>
+          {title&&<h1>Practicing round 5, subject {sub}</h1>}
           
             <strong>Clues:</strong>{' '}
             <ol style={{listStyle:"revert"}} className='px-4'>
