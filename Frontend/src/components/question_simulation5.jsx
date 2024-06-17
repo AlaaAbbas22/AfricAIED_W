@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import http from './http';
 import Latex from 'react-latex';
 
-const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{} }) => {
+const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}, save=true }) => {
   const [answer, setAnswer] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -36,6 +36,7 @@ const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub, title=tr
         round: 'round_5', // Assuming round 5
         id: questionId,
         answer: answer,
+        save:save,
       });
 
       if (response.data.authenticated === false) {
@@ -45,7 +46,8 @@ const QuestionSimulationRound5 = ({ baseURL, question, questionId, sub, title=tr
 
       setResult(response.data.result ? 'Correct' : 'Incorrect');
       if (response.data.result){
-        scoring((e)=>e+1);
+        const score = clueIndex == 0 && 5 || clueIndex == 1 && 4 || 3
+        scoring((e)=>e+score);
         setAnswered(true);
       };
       if (response.data.model) {

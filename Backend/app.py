@@ -10,6 +10,7 @@ import uuid
 import random
 from flask_cors import CORS
 from models import text_to_speech, stt, grader, llm_api
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -203,11 +204,83 @@ def grading():
     question = entry["Question"]
     model_answer = entry["Answer"]
     student_answer = request.json["answer"]
-    if grader(question, student_answer, model_answer)==1:
+    res = grader(question, student_answer, model_answer)
+
+    if request.json["save"] or True:
+        db.questions.insert_one({'Question': question,"round":request.json["round"],"subject":entry["Subject"], 'Answer': student_answer, "model": model_answer, "score": res, 'id': user["_id"], 'timestamp': datetime.now(timezone.utc)})
+
+
+    if res==1:
         return {"result": True}
     else:
         print(model_answer)
         return {"result": False, "model":model_answer}
+
+@app.route('/save_round', methods=['POST'])
+def round_saving():
+
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+    db.rounds.insert_one({'round': request.json["round"], 'score': request.json["score"], 'questions': request.json["questions"], "id":user["_id"], 'timestamp':datetime.now(timezone.utc)})
+    return jsonify({"status": "success"}), 200
+
+
+
+
+@app.route('/fetch_history', methods=['GET'])
+def history():
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+    hist1 = fetch_5recent_round(user["_id"], 10)
+    hist2 = fetch_5recent_question(user["_id"], 30)
+    return jsonify({"rounds":hist1, "questions":hist2}), 200
+
+def fetch_5recent_round(user_id, count):
+    result = []
+    res = db.rounds.find({"id":user_id}).sort('timestamp', -1).limit(count)
+    for entry in res:
+        round = {"round": entry["round"], "questions": entry["questions"], "score":entry["score"]}
+        result.append(round)
+    return result
+
+def fetch_5recent_question(user_id, count):
+    result = []
+    res = db.questions.find({"id":user_id}).sort('timestamp', -1).limit(count)
+    for entry in res:
+        round = {'question': entry['Question'],'round':entry["round"], "subject":entry["subject"], 'answer': entry['Answer'], "model": entry["model"], "score":entry["score"]}
+        result.append(round)
+    return result
+
+@app.route('/recommend', methods=['GET'])
+def recc():
+    session_id = session.get('session_id')
+    if not session_id:
+        return jsonify({'authenticated': False}), 200
+    user = db.users.find_one({'sessionids': session_id})
+    if not user:
+        return jsonify({'authenticated': False}), 200
+    prompt = "I have the result of practice questions of a student for NSMQ competition. Could you please give him recommendations on things to focus on, such as the subject and the round to focus on. Speak as if you are talking to the student directly and style your response in markdown:\n Here is the result of practicing single questions:\n"
+    
+    hist1 = fetch_5recent_round(user["_id"], 10)
+    hist2 = fetch_5recent_question(user["_id"], 10)
+
+    for item in hist2:
+        temp = f'\n\n round: {item["round"]}, question: {item["question"]}, subject: {item["subject"]}, student answer: {item["answer"]}, model answer: {item["model"]}, grade: {item["score"]}'
+        prompt += temp
+    prompt += "\n\n\nHere are the results of complete round practice"
+    for round in hist1:
+        temp = f'\n\n round: {round["round"]}, no. questions: {round["questions"]}, score: {round["score"]}'
+        prompt += temp
+    res = llm_api(prompt)
+    return jsonify({"result":res, "p":prompt}), 200
 
 @app.route('/get_round', methods=['POST'])
 def get_random_questions_complete_round():
@@ -253,4 +326,4 @@ def get_random_questions_complete_round():
     return jsonify({"Response":"Round not found"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=False, port=8000)

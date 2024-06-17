@@ -12,6 +12,8 @@ import Dashboard from './components/dashboard';
 import Layout from './components/layout';
 import Question from './components/question';
 import Round from './components/round';
+import History from './components/history';
+import Recommend from './components/recommend';
 
 const baseURL = "http://127.0.0.1:8000";
 
@@ -36,6 +38,14 @@ const router = createBrowserRouter([
       {
         path: "/practice_round",
         element:<Round baseURL={baseURL}/>,
+      },
+      {
+        path: "/report",
+        element:<History baseURL={baseURL}/>,
+      },
+      {
+        path: "/report/recommend",
+        element:<Recommend baseURL={baseURL}/>,
       },
     ],
   },

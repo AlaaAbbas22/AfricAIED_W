@@ -6,7 +6,7 @@ import tts from "./question"
 
 
 
-const QuestionSimulationRound4 = ({baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}}) => {
+const QuestionSimulationRound4 = ({baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}, save=true}) => {
   
 
   
@@ -35,25 +35,29 @@ const QuestionSimulationRound4 = ({baseURL, question, questionId, sub, title=tru
     
     
 
-      const handleSubmit = async (e) => {
-        e.preventDefault();
+      const handleSubmit = async (attempt) => {
+        
         setAnswered(true)
         try {
           const response = await http.post(`${baseURL}/grade`, {
             round: "round_4",   // Assuming round 1
             id: questionId,
-            answer: answer
+            answer: answer,
+            save:save,
           });
     
           if (response.data.authenticated === false) {
             setError('User not authenticated');
             return;
           }
-          tts(response.data.result ? 'Correct' : 'Incorrect')
-          setResult(response.data.result ? 'Correct' : 'Incorrect');
-          if (response.data.result){
-            scoring((e)=>e+1)
-          };
+          
+          if(attempt){if (response.data.result){
+            tts(response.data.result ? 'Correct' : 'Incorrect')
+            setResult(response.data.result ? 'Correct' : 'Incorrect');
+            scoring((e)=>e+2);
+          } else {
+            scoring((e)=>e-1);
+          }}
           if (response.data.model){
             setModel(response.data.model)
           };
@@ -71,7 +75,7 @@ const QuestionSimulationRound4 = ({baseURL, question, questionId, sub, title=tru
         <div className='p-5'>
           {title&&<h1>Practicing round 4, subject {sub}</h1>}
           <p><strong>Question:</strong> <Latex>{question}</Latex></p>
-          <form onSubmit={handleSubmit}>
+          <form >
             <input
               type="text"
               value={answer}
@@ -81,7 +85,8 @@ const QuestionSimulationRound4 = ({baseURL, question, questionId, sub, title=tru
               disabled={answered}
               className='p-3 text-center m-2 font-sans border'
             />
-            <button disabled={answered} type="submit">Submit Answer</button>
+            <button disabled={answered} onClick={()=>{handleSubmit(true)}} >Submit Answer</button>
+            <button disabled={answered} onClick={()=>{handleSubmit(false)}} >Skip question (no penalty) </button>
           </form>
           {result && <p><strong>Result:</strong> {result}</p>}
           {model && <p><strong>Model Answer:</strong><br></br> <Latex>{model}</Latex></p>}

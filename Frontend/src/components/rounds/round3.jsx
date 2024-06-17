@@ -81,8 +81,10 @@ function Round3({baseURL, questions}){
 
     useEffect(()=>{
         (index < questions.length&&tts(convertLatexToReadableText(questions[index]["Question"]))) 
-       setCurrent(index < questions.length&&<QuestionSimulationRound3 question={questions[index]["Question"]} baseURL={baseURL} sub={questions[index]["Subject"]} questionId={questions[index]["id"]} title={false} next={setNextValid} scoring={setScore} key={index}/>|| "")
-       
+       setCurrent(index < questions.length&&<QuestionSimulationRound3 question={questions[index]["Question"]} baseURL={baseURL} sub={questions[index]["Subject"]} questionId={questions[index]["id"]} title={false} next={setNextValid} scoring={setScore} save={false} key={index}/>|| "")
+       if(index == questions.length){
+        http.post(`${baseURL}/save_round`, { round:"Round 3", score:score, questions:questions.length })
+       }
     },[index])
     return (index < questions.length&&<div className="p-5">
         <h1>Practice Round 3, Question No. {index+1} out of {questions.length}, Score: {score}</h1>

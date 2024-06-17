@@ -26,9 +26,9 @@ function LoginForm({baseURL}){
         }
     };
 
-    return (<div className="container">
+    return (<div className="container mt-[20vh]">
         <div className="login-box">
-            <h1>Welcome to<br/>National Science & Maths Quiz!</h1>
+            <h1>Welcome to<br/>National Science & Maths Quiz Prep App by Team Kernel! <br></br> (Not affiliated with NSMQ)</h1>
             <form>
                 <div className="textbox">
                     <input type="text" placeholder="E-mail or Username" name="username" required value={email} onChange={(e)=>setEmail(e.target.value)}/>

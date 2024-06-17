@@ -152,3 +152,29 @@ out = model(**inputs)
 
 prediction = F.softmax(out.logits, dim=-1).argmax().item()
 print(prediction)'''
+
+import requests
+import json
+
+def llm_api(input):    # Define the URL of the API endpoint
+    url = "https://hflink-eastus-models-playground.azure-api.net/models/Phi-3-small-128k-instruct/score"
+
+    data = {
+        "messages": [
+            {'role': 'user', 'content': input}
+        ],
+        "max_tokens": 50000,
+        "temperature": 0.7,
+        "top_p": 1,
+    }
+
+    response = requests.post(url, json=data)
+    for i in response:
+        print(i)
+    if response.status_code == 200:
+        response_data = response.json()
+        return response_data['choices'][0]['message']['content']
+    else:
+        return f'Request failed with status code: {response.status_code}'
+    
+print(llm_api("hey"))

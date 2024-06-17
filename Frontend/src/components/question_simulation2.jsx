@@ -6,7 +6,7 @@ import tts from "./question"
 
 
 
-const QuestionSimulationRound2 = ({baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}}) => {
+const QuestionSimulationRound2 = ({baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}, save=true}) => {
   
 
   
@@ -41,7 +41,8 @@ const QuestionSimulationRound2 = ({baseURL, question, questionId, sub, title=tru
           const response = await http.post(`${baseURL}/grade`, {
             round: "round_2",   // Assuming round 1
             id: questionId,
-            answer: answer
+            answer: answer,
+            save:save,
           });
           
           if (response.data.authenticated === false) {
@@ -51,7 +52,7 @@ const QuestionSimulationRound2 = ({baseURL, question, questionId, sub, title=tru
           tts(response.data.result ? 'Correct' : 'Incorrect')
           setResult(response.data.result ? 'Correct' : 'Incorrect');
           if (response.data.result){
-            scoring((e)=>e+1)
+            scoring((e)=>e+3)
           };
           if (response.data.model){
             setModel(response.data.model)

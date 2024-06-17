@@ -6,10 +6,11 @@ import tts from "./question"
 
 
 
-const QuestionSimulationRound3 = ({baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}}) => {
+const QuestionSimulationRound3 = ({baseURL, question, questionId, sub, title=true, next = (e)=>{}, scoring = (e)=>{}, save=true}) => {
   
 
-  
+  const [showQuestion, setShowQuestion] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(240); // 4 minutes in seconds
   const [answer, setAnswer] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -31,17 +32,36 @@ const QuestionSimulationRound3 = ({baseURL, question, questionId, sub, title=tru
     })
   }
 
+  useEffect(() => {
+    if (showQuestion) {
+      const intervalId = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(intervalId);
+            // Handle time up (e.g., submit answer automatically, show message, etc.)
+            alert('Time is up! Your response was submitted automatically.');
+            handleSubmit("");
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(intervalId); // Cleanup interval on component unmount
+    }
+  }, [showQuestion]);
     
     
 
       const handleSubmit = async (e) => {
-        e.preventDefault();
-        setAnswered(true)
+        try {e.preventDefault();} catch(err){}
+        setAnswered(true);
         try {
           const response = await http.post(`${baseURL}/grade`, {
             round: "round_3",   // Assuming round 1
             id: questionId,
-            answer: answer
+            answer: answer,
+            save:save,
           });
     
           if (response.data.authenticated === false) {
@@ -51,7 +71,7 @@ const QuestionSimulationRound3 = ({baseURL, question, questionId, sub, title=tru
           tts(response.data.result ? 'Correct' : 'Incorrect')
           setResult(response.data.result ? 'Correct' : 'Incorrect');
           if (response.data.result){
-            scoring((e)=>e+1)
+            scoring((e)=>e+10)
           };
           if (response.data.model){
             setModel(response.data.model)
@@ -60,15 +80,16 @@ const QuestionSimulationRound3 = ({baseURL, question, questionId, sub, title=tru
           console.error('Error grading answer:', err);
           setError('Error grading answer');
         };
-        next(true)
+        next(true);
       };
 
       
   return (
     <div>
-      {true ? (
+      {showQuestion ? (
         <div className='p-5'>
           {title&&<h1>Practicing round 3, subject {sub}</h1>}
+          <p className='ring p-2 mb-2'>Time left: {Math.floor(timeLeft / 60)}:{timeLeft % 60 < 10 ? `0${timeLeft % 60}` : timeLeft % 60}</p>
           <p><strong>Question:</strong> <Latex>{question}</Latex></p>
           <form onSubmit={handleSubmit}>
             <input

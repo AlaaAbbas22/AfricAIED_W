@@ -13,8 +13,8 @@ function Layout({baseURL}){
         window.location.replace("/login");
       }
 
-    return (localStorage.getItem("logged")=="true"&&<>
-    <div className=" fixed top-0 left-[50%] mt-5 ml-[-130px] grid grid-cols-2">
+    return (localStorage.getItem("logged")=="true"&&<div className="pt-7 mt-[15vh]">
+    <div className=" fixed top-0 left-[50%] mt-5 ml-[-230px] grid grid-cols-3">
         <div className='sign-up-button'>
             <button style={{backgroundColor:"#f00"}} onClick={logout}>
                 Log out
@@ -25,10 +25,15 @@ function Layout({baseURL}){
                 Dashboard
             </button>
         </Link>
+        <Link className='sign-up-button' to="/report">
+            <button>
+                Report/History
+            </button>
+        </Link>
     </div>
     
     <Outlet/>
-  </>||<Navigate replace to="/login" />)
+  </div>||<Navigate replace to="/login" />)
 }
 
 export default Layout
