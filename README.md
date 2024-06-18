@@ -17,7 +17,7 @@
 ## Features
 
 <p align="center">
-  <img src="=https://github.com/AlaaAbbas22/AfricAIED_W/assets/121454779/449735de-52a6-4a4c-afc8-873500bccfd2"  />
+  <img src="https://github.com/AlaaAbbas22/AfricAIED_W/assets/121454779/449735de-52a6-4a4c-afc8-873500bccfd2"  />
 </p>
 
 - **Extensive Question Bank**: Compiled over 12,000 practice questions across various subjects and competition rounds.
