@@ -1,0 +1,13 @@
+TTS
+numpy
+uuid
+flask_cors
+datetime
+bson
+pymongo
+flask_session
+flask
+transformers
+torch
+speech_recognition
+requests
